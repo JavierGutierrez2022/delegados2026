@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UsuarioController extends Controller
 {
@@ -44,6 +46,7 @@ class UsuarioController extends Controller
         $usuario->name = $request->name;
         $usuario->email = $request->email;
         $usuario->password = Hash::make($request['password']);
+        $usuario->slug = Str::uuid();
         $usuario->save();
 
         return redirect()->route('usuarios.index')
@@ -103,4 +106,34 @@ class UsuarioController extends Controller
             ->with('mensaje','Se eliminó al usuario de la manera correcta')
             ->with('icono','success');
     }
+
+    public function registro(){
+        return view( 'auth.registro');
+    }
+
+    public function registro_create(Request $request)
+    {
+        //$datos = request()->all();
+        //return response()->json($datos);
+
+        $request->validate([
+            'name' => 'required|max:100',
+            'email' => 'required|unique:users',
+            'password' => 'required|confirmed',
+        ]);
+
+        $usuario = new User();
+        $usuario->name = $request->name;
+        $usuario->email = $request->email;
+        $usuario->password = Hash::make($request['password']);
+        $usuario->save();
+
+        Auth::login($usuario);
+
+        return redirect('/')
+            ->with('mensaje','Bienvenido a la plataforma gestión de archivos')
+            ->with('icono','success');
+
+    }
+
 }
