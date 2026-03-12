@@ -96,7 +96,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 {{-- Roles --}}
                 @can('menu.roles')
                 @php $open = request()->routeIs('roles.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="roles">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-user-shield"></i>
                     <p>Roles <i class="right fas fa-angle-left"></i></p>
@@ -119,7 +119,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 {{-- Permisos --}}
                 @can('menu.permisos')
                 @php $open = request()->routeIs('permissions.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="permissions">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-key"></i>
                     <p>Permisos <i class="right fas fa-angle-left"></i></p>
@@ -142,7 +142,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 {{-- Usuarios --}}
                 @can('menu.usuarios')
                 @php $open = request()->routeIs('usuarios.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="usuarios">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-users"></i>
                     <p>Usuarios <i class="right fas fa-angle-left"></i></p>
@@ -163,7 +163,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                 @can('menu.delegados')
                 @php $open = request()->routeIs('delegados.*') || request()->routeIs('admin.delegados.*') || request()->routeIs('asignaciones.*') || request()->routeIs('postulaciones.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="delegados">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-id-card"></i>
                     <p>Delegados <i class="right fas fa-angle-left"></i></p>
@@ -204,7 +204,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 @endphp
                 @if($canReportes)
                 @php $open = request()->routeIs('reportes.*') || request()->routeIs('asignados.*') || request()->routeIs('cobertura.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="reportes">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-chart-bar"></i>
                     <p>Reportes <i class="right fas fa-angle-left"></i></p>
@@ -251,7 +251,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 @if($canConfig)
                 <li class="nav-header">CONFIGURACION</li>
                 @php $open = request()->routeIs('delegados.import.*') || request()->routeIs('recintos.excel.*') || request()->routeIs('distritos.excel.*') || request()->routeIs('staging.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="configuracion">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-cogs"></i>
                     <p>Configuracion <i class="right fas fa-angle-left"></i></p>
@@ -293,7 +293,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 @can('menu.auditorias')
                 <li class="nav-header">AUDITORIAS</li>
                 @php $open = request()->routeIs('reportes.*') || request()->routeIs('recintos.reporte') || request()->routeIs('asignados.*'); @endphp
-                <li class="nav-item {{ $open ? 'menu-is-opening menu-open' : '' }}">
+                <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="auditorias">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-chart-bar"></i>
                     <p>Auditorias <i class="right fas fa-angle-left"></i></p>
@@ -417,6 +417,83 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
 @stack('scripts')
+<script>
+  $(function () {
+    const storageKey = 'admin-sidebar-open-menus';
+    const $menus = $('.js-persistent-tree');
+
+    function getStoredMenus() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        const parsed = JSON.parse(raw || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveStoredMenus(keys) {
+      localStorage.setItem(storageKey, JSON.stringify(keys));
+    }
+
+    function openMenu($item) {
+      $item.addClass('menu-is-opening menu-open');
+      $item.children('.nav-link').addClass('active');
+      $item.children('.nav-treeview').stop(true, true).slideDown(150);
+    }
+
+    function closeMenu($item) {
+      $item.removeClass('menu-is-opening menu-open');
+      if (!$item.find('.nav-treeview .nav-link.active').length) {
+        $item.children('.nav-link').removeClass('active');
+      }
+      $item.children('.nav-treeview').stop(true, true).slideUp(150);
+    }
+
+    const storedMenus = new Set(getStoredMenus());
+
+    $menus.each(function () {
+      const $item = $(this);
+      const key = $item.data('menuKey');
+      const hasActiveChild = $item.find('.nav-treeview .nav-link.active').length > 0;
+
+      if (hasActiveChild) {
+        storedMenus.add(key);
+      }
+
+      if (storedMenus.has(key)) {
+        openMenu($item);
+      } else {
+        $item.removeClass('menu-is-opening menu-open');
+        if (!$item.find('.nav-treeview .nav-link.active').length) {
+          $item.children('.nav-link').removeClass('active');
+        }
+        $item.children('.nav-treeview').hide();
+      }
+    });
+
+    saveStoredMenus(Array.from(storedMenus));
+
+    $menus.children('.nav-link').on('click', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const $item = $(this).closest('.js-persistent-tree');
+      const key = $item.data('menuKey');
+      const currentMenus = new Set(getStoredMenus());
+
+      if ($item.hasClass('menu-open')) {
+        closeMenu($item);
+        currentMenus.delete(key);
+      } else {
+        openMenu($item);
+        currentMenus.add(key);
+      }
+
+      saveStoredMenus(Array.from(currentMenus));
+    });
+  });
+</script>
 <style>
   /* ====== Sidebar Clean (Opción C) ====== */
   :root{
