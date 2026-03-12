@@ -122,7 +122,7 @@
             <div style="min-width:220px;">
               <label for="matriz_distrito_export" id="lbl-matriz-grupo" class="form-label mb-1">Distrito</label>
               <select id="matriz_distrito_export" class="form-control form-control-sm">
-                <option value="">Seleccionar distrito</option>
+                <option value="TODOS">TODOS</option>
               </select>
             </div>
             <a href="#" id="btn-matriz-excel-distrito" class="btn btn-outline-success btn-sm">
@@ -188,7 +188,7 @@ $(function(){
   function applyMatrizGroupLabels() {
     const isTarija = isTarijaMunicipioSelected();
     const groupTitle = isTarija ? 'Distrito' : 'Asiento electoral';
-    const placeholder = isTarija ? 'Seleccionar distrito' : 'Seleccionar asiento electoral';
+    const placeholder = 'TODOS';
     const btnLabel = isTarija ? 'Exportar distrito (detalle)' : 'Exportar asiento electoral (detalle)';
 
     $('#th-matriz-grupo').text(groupTitle);
@@ -415,7 +415,7 @@ $(function(){
     const $tb = $('#tabla-matriz tbody');
     $tb.empty();
     const $districtSelect = $('#matriz_distrito_export');
-    $districtSelect.html('<option value="">Seleccionar distrito</option>');
+    $districtSelect.html('<option value="TODOS">TODOS</option>');
     applyMatrizGroupLabels();
 
     if (!rows || rows.length === 0) {
@@ -457,7 +457,7 @@ $(function(){
     $('#btn-matriz-excel-distrito').attr('href', '#');
     $('#btn-matriz-excel-faltantes').attr('href', excelUrl + '&matriz_status=faltantes');
     $('#btn-matriz-excel-completos').attr('href', excelUrl + '&matriz_status=completos');
-    $('#matriz_distrito_export').val('');
+    $('#matriz_distrito_export').val('TODOS');
     applyMatrizGroupLabels();
 
     $.get("{{ route('cobertura.matriz') }}", f, function(res){
@@ -468,17 +468,12 @@ $(function(){
 
   $('#btn-matriz-excel-distrito').on('click', function(e){
     const distrito = ($('#matriz_distrito_export').val() || '').toString().trim();
-    if (!distrito) {
-      e.preventDefault();
-      const msg = isTarijaMunicipioSelected()
-        ? 'Seleccione un distrito para exportar.'
-        : 'Seleccione un asiento electoral para exportar.';
-      alert(msg);
-      return;
-    }
-
     const f = currentFilters();
-    f.matriz_distrito = distrito;
+    if (distrito && distrito !== 'TODOS') {
+      f.matriz_distrito = distrito;
+    } else {
+      f.matriz_distrito = 'TODOS';
+    }
     const excelUrl = "{{ route('cobertura.matriz.excel') }}" + '?' + $.param(f);
     $(this).attr('href', excelUrl);
   });
