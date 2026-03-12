@@ -249,7 +249,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 @endphp
                 @if($canConfig)
                 <li class="nav-header">CONFIGURACION</li>
-                @php $open = request()->routeIs('delegados.import.*') || request()->routeIs('recintos.excel.*') || request()->routeIs('distritos.excel.*') || request()->routeIs('staging.*'); @endphp
+                @php $open = request()->routeIs('delegados.import.*') || request()->routeIs('recintos.excel.*') || request()->routeIs('recintos.manage.*') || request()->routeIs('distritos.excel.*') || request()->routeIs('staging.*'); @endphp
                 <li class="nav-item js-persistent-tree {{ $open ? 'menu-is-opening menu-open' : '' }}" data-menu-key="configuracion">
                     <a href="#" class="nav-link {{ $open ? 'active' : '' }}">
                     <i class="nav-icon fas fa-cogs"></i>
@@ -267,6 +267,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <li class="nav-item">
                         <a href="{{ route('recintos.excel.form') }}" class="nav-link {{ request()->routeIs('recintos.excel.*') ? 'active' : '' }}">
                         <i class="nav-icon far fa-circle"></i><p>Actualizar recintos por Excel</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('recintos.manage.index') }}" class="nav-link {{ request()->routeIs('recintos.manage.*') ? 'active' : '' }}">
+                        <i class="nav-icon far fa-circle"></i><p>Modificar mesas de recintos</p>
                         </a>
                     </li>
                     @endcan

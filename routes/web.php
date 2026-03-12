@@ -12,6 +12,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentCrudController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\RecintoMesaManagerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,10 @@ Route::middleware(['auth','can:menu.actualizar_recintos_por_excel'])->prefix('ad
     Route::post('actualizar-excel/preview', [\App\Http\Controllers\RecintoMesaExcelController::class, 'preview'])->name('preview');
     Route::post('actualizar-excel', [\App\Http\Controllers\RecintoMesaExcelController::class, 'store'])->name('store');
     Route::get('actualizar-excel/plantilla', [\App\Http\Controllers\RecintoMesaExcelController::class, 'template'])->name('template');
+});
+Route::middleware(['auth','can:menu.actualizar_recintos_por_excel'])->prefix('admin/recintos')->name('recintos.manage.')->group(function () {
+    Route::get('modificar-mesas', [RecintoMesaManagerController::class, 'index'])->name('index');
+    Route::put('{precinct}/modificar-mesas', [RecintoMesaManagerController::class, 'update'])->name('update');
 });
 Route::middleware(['auth','can:menu.actualizar_distritos_por_excel'])->prefix('admin/distritos')->name('distritos.excel.')->group(function () {
     Route::get('actualizar-excel', [\App\Http\Controllers\DistrictExcelController::class, 'form'])->name('form');
