@@ -169,11 +169,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <p>Delegados <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
+                    @if(auth()->user()?->hasRole('admin'))
                     <li class="nav-item">
                         <a href="{{ route('admin.delegados.index') }}" class="nav-link {{ request()->routeIs('admin.delegados.index') ? 'active' : '' }}">
                         <i class="nav-icon far fa-circle"></i><p>Listado de delegados</p>
                         </a>
                     </li>
+                    @endif
                     <li class="nav-item">
                         <a href="{{ url('admin/delegados/create') }}" class="nav-link {{ request()->is('admin/delegados/create') ? 'active' : '' }}">
                         <i class="nav-icon far fa-circle"></i><p>Crear delegado</p>
@@ -199,8 +201,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <li class="nav-header">REPORTES</li>
 
                 @php
-                    $canReportes = auth()->check()
-                        && (auth()->user()->can('menu.reportes') || auth()->user()->can('menu.cobertura_mesas'));
+                    $canReportes = auth()->check();
                 @endphp
                 @if($canReportes)
                 @php $open = request()->routeIs('reportes.*') || request()->routeIs('asignados.*') || request()->routeIs('cobertura.*'); @endphp
@@ -227,14 +228,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </a>
                     </li>
                     @endcan
-                    @can('menu.cobertura_mesas')
                     <li class="nav-item">
                     <a href="{{ route('cobertura.index') }}" class="nav-link {{ request()->routeIs('cobertura.*') ? 'active' : '' }}">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Cobertura de Mesas</p>
                     </a>
                     </li>
-                    @endcan
                     </ul>
                 </li>
                 @endif

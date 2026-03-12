@@ -18,6 +18,11 @@ use App\Exports\DelegadosTemplateExport;
 
 class MiembroController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'])->only(['index']);
+    }
+
      public function index()
     {
        /*  $miembros = Miembro :: all()->sortByDesc('id'); */
@@ -93,7 +98,11 @@ class MiembroController extends Controller
                     throw $e;
                 }
 
-                return redirect()->route('admin.delegados.index')
+                $redirectRoute = auth()->user()?->hasRole('admin')
+                    ? 'admin.delegados.index'
+                    : 'delegados.create';
+
+                return redirect()->route($redirectRoute)
                     ->with('mensaje','Se registró correctamente')
                     ->with('icono','success');
             }
