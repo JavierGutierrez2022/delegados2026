@@ -156,7 +156,7 @@
                 </div>
 
                 <div class="mt-3">
-                    {{ $recintos->links() }}
+                    {{ $recintos->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         </div>
