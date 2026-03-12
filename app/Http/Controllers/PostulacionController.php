@@ -199,6 +199,7 @@ class PostulacionController extends Controller
 
         $q->when($request->filled('province_id'), fn ($qq) => $qq->where('m.province_id', $request->province_id));
         $q->when($request->filled('municipality_id'), fn ($qq) => $qq->where('m.municipality_id', $request->municipality_id));
+        $q->when($request->filled('district_id'), fn ($qq) => $qq->where('r.district_id', $request->district_id));
         $q->when($request->filled('precinct_id'), fn ($qq) => $qq->where('m.electoral_precinct_id', $request->precinct_id));
         $q->when($request->filled('cedula'), fn ($qq) => $qq->where('m.ci', 'like', '%' . $request->cedula . '%'));
         $q->when($request->filled('telefono'), fn ($qq) => $qq->where('m.celular', 'like', '%' . $request->telefono . '%'));

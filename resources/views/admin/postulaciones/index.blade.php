@@ -34,6 +34,13 @@
                 </select>
               </div>
 
+              <div class="col-md-2 d-none" id="wrap-district">
+                <label class="form-label">Distrito</label>
+                <select name="district_id" id="district_id" class="form-control">
+                  <option value="">TODOS</option>
+                </select>
+              </div>
+
               <div class="col-md-3">
                 <label class="form-label">Recinto</label>
                 <select name="precinct_id" id="precinct_id" class="form-control">
@@ -106,10 +113,39 @@
 @push('scripts')
 <script>
 $(function(){
+  let precinctCache = [];
+
+  $('#precinct_id').select2({
+    placeholder: 'TODOS',
+    allowClear: true,
+    width: '100%'
+  });
+
+  function isTarijaMunicipioSelected() {
+    const municipalityId = ($('#municipality_id').val() || '').toString().trim();
+    const selectedText = ($('#municipality_id option:selected').text() || '').trim().toLowerCase();
+    return municipalityId !== '' && selectedText === 'tarija';
+  }
+
+  function applyPrecinctOptionsFromCache() {
+    const selectedDistrict = ($('#district_id').val() || '').toString().trim();
+    let data = precinctCache;
+
+    if (selectedDistrict) {
+      data = precinctCache.filter(x => String(x.district_id || '') === selectedDistrict);
+    }
+
+    let opts = '<option value="">TODOS</option>';
+    data.forEach(x => opts += `<option value="${x.id}">${x.name}</option>`);
+    $('#precinct_id').html(opts);
+    $('#precinct_id').val('').trigger('change');
+  }
+
   function buildExportUrl() {
     const params = new URLSearchParams({
       province_id: $('#province_id').val() || '',
       municipality_id: $('#municipality_id').val() || '',
+      district_id: $('#district_id').val() || '',
       precinct_id: $('#precinct_id').val() || '',
       cedula: $('#cedula').val() || '',
       telefono: $('#telefono').val() || '',
@@ -127,7 +163,11 @@ $(function(){
   $('#province_id').on('change', function(){
     let id = $(this).val();
     $('#municipality_id').html('<option value="">TODOS</option>');
+    $('#district_id').html('<option value="">TODOS</option>');
+    $('#wrap-district').addClass('d-none');
     $('#precinct_id').html('<option value="">TODOS</option>');
+    $('#precinct_id').val('').trigger('change');
+    precinctCache = [];
     if(!id) { table.ajax.reload(); return; }
 
     $.get("{{ url('/admin/municipios/por-provincia') }}/"+id, function(res){
@@ -140,15 +180,35 @@ $(function(){
 
   $('#municipality_id').on('change', function(){
     let id = $(this).val();
+    const isTarija = isTarijaMunicipioSelected();
+
+    $('#district_id').html('<option value="">TODOS</option>');
+    if (isTarija && id) {
+      $('#wrap-district').removeClass('d-none');
+      $.get("{{ url('/admin/distritos/por-municipio') }}/"+id, function(res){
+        let opts = '<option value="">TODOS</option>';
+        res.forEach(x => opts += `<option value="${x.id}">${x.name}</option>`);
+        $('#district_id').html(opts);
+      });
+    } else {
+      $('#wrap-district').addClass('d-none');
+    }
+
     $('#precinct_id').html('<option value="">TODOS</option>');
+    $('#precinct_id').val('').trigger('change');
+    precinctCache = [];
     if(!id) { table.ajax.reload(); return; }
 
     $.get("{{ url('/recintos/por-municipio') }}/"+id, function(res){
-      let opts = '<option value="">TODOS</option>';
-      res.forEach(x => opts += `<option value="${x.id}">${x.name}</option>`);
-      $('#precinct_id').html(opts);
+      precinctCache = res || [];
+      applyPrecinctOptionsFromCache();
       table.ajax.reload();
     });
+  });
+
+  $('#district_id').on('change', function(){
+    applyPrecinctOptionsFromCache();
+    table.ajax.reload();
   });
 
   // DataTable
@@ -163,6 +223,7 @@ $(function(){
       data: function (d) {
         d.province_id     = $('#province_id').val();
         d.municipality_id = $('#municipality_id').val();
+        d.district_id     = $('#district_id').val();
         d.precinct_id     = $('#precinct_id').val();
         d.cedula          = $('#cedula').val();
         d.telefono        = $('#telefono').val();
@@ -206,8 +267,12 @@ $(function(){
   $('#btn-limpiar').on('click', function(){
     $('#province_id').val('');
     $('#municipality_id').html('<option value="">TODOS</option>');
+    $('#district_id').html('<option value="">TODOS</option>');
+    $('#wrap-district').addClass('d-none');
     $('#precinct_id').html('<option value="">TODOS</option>');
+    $('#precinct_id').val('').trigger('change');
     $('#cedula, #telefono').val('');
+    precinctCache = [];
     table.ajax.reload();
   });
 
@@ -279,6 +344,19 @@ $(function(){
 });
 </script>
 <style>
+  #select2-precinct_id-container {
+    line-height: calc(2.25rem + 2px);
+  }
+
+  .select2-container .select2-selection--single {
+    height: calc(2.25rem + 2px);
+    border: 1px solid #ced4da;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: calc(2.25rem + 2px);
+  }
+
   #btn-exportar-excel {
     min-width: 170px;
     font-weight: 600;
