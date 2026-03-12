@@ -12,7 +12,9 @@ class ProvinceController extends Controller
 {
  public function getMunicipalitiesByProvince($provinceId)
 {
-    $municipalities = Municipality::where('province_id', $provinceId)->get();
+    $municipalities = Municipality::where('province_id', $provinceId)
+        ->where('state', 'ACTIVO')
+        ->get();
 
     return response()->json($municipalities);
 }

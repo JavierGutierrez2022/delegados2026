@@ -29,6 +29,8 @@
                     <i class="bi bi-person-fill-add"></i> Agregar Miembro
                   </a>
                 </div>
+
+                
                 <!-- /. boton agregar -->
 
               </div>
@@ -40,18 +42,14 @@
                   <thead>
                         <tr>
                             <th>Nro</th>
+                            <th>C.I.</th>
                             <th>Nombres</th>
                             <th>Apellido Paterno</th>
                             <th>Apellido Materno</th>
-                            <th>Genero</th>
-                            <th>C.I.</th>
+                            <th>Genero</th>                            
                             <th>Fecha Nacimiento</th>
-                            <th>Celular</th>
-                            <th>Recinto Votación</th>
-                            <th>Agrupación</th>
-                            <th>Observación</th>
-                            <th>Estado</th>
-                            <th>Encargado</th>
+                            <th>Celular</th>                          
+                            <th>Observación</th>                
                             <th>Provincia</th>
                             <th>Municipio</th>
                             <th>Recinto</th>
@@ -65,18 +63,14 @@
                              @foreach ($miembros as $miembro)
                                     <tr>
                                         <td><?php echo $contador = $contador+1 ?></td>
+                                        <td> {{$miembro->ci}}</td>
                                         <td> {{$miembro->nombres}}</td>
                                         <td> {{$miembro->app}}</td>
                                         <td> {{$miembro->apm}}</td>
-                                        <td> {{$miembro->genero}}</td>
-                                        <td> {{$miembro->ci}}</td>
-                                        <td> {{$miembro->fecnac}}</td>
-                                        <td> {{$miembro->celular}}</td>
-                                        <td> {{$miembro->recintovot}}</td>
-                                        <td> {{$miembro->agrupa}}</td>
-                                        <td> {{$miembro->obs}}</td>
-                                        <td> {{$miembro->estado}}</td>
-                                        <td> {{$miembro->delegado}}</td>
+                                        <td> {{$miembro->genero}}</td>                                        
+                                        <td>{{ optional($miembro->fecnac)->format('d/m/Y') }}</td>
+                                        <td> {{$miembro->celular}}</td>                                     
+                                        <td> {{$miembro->obs}}</td>                                        
                                        <td>{{ $miembro->province->name ?? 'Sin provincia' }}</td>
                                         <td>{{ $miembro->municipality->name ?? 'Sin municipio' }}</td>
                                         <td>{{ $miembro->electoralPrecinct->name ?? 'Sin recinto' }}</td>
@@ -113,7 +107,7 @@
                                     "pageLength": 10,
                                     "language": {
                                         "emptyTable": "No hay información",
-                                        "info": "Mostrando START a END de TOTAL Miembros",
+                                        "info": "Mostrando _START_ a _END_ de _TOTAL_ Miembros",
                                         "infoEmpty": "Mostrando 0 a 0 de 0 Miembros",
                                         "infoFiltered": "(Filtrado de MAX total Miembros)",
                                         "infoPostFix": "",
@@ -158,7 +152,7 @@
                                     ],
                                 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                             });
-</script>
+        </script>
               </div>
               <!-- /.card-body -->
             </div>

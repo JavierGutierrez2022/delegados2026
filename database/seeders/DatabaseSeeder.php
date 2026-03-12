@@ -12,19 +12,28 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void
+        public function run(): void
     {
+        $this->call(RolesAndPermissionsSeeder::class);
+
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        // Evita duplicar si ya existe el admin
+    if (!User::where('email', 'admin@admin.com')->exists()) {
         User::create([
-            'name'=>'admin',
-            'email'=>'admin@admin.com',
-            'password'=>Hash::make('12345678'),
+            'name' => 'admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('admin'),
         ]);
+    }
+      
+
+       $this->call(MiembrosExcelSeeder::class);    
 
     }
+    
 }

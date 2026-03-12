@@ -14,5 +14,9 @@ class Table extends Model
     return $this->belongsToMany(Miembro::class, 'miembro_table', 'table_id', 'miembro_id');
 }
 
-
+ public function electoralPrecinct()
+    {
+        return $this->belongsTo(ElectoralPrecinct::class, 'electoral_precinct_id');
+    }
+    
 }

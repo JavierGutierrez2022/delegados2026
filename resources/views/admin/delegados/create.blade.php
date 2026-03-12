@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="content">
-        <h1>Creación de nuevo miembro</h1>
+        <h1>Creación de nuevo delegado</h1>
     </div>  
     
     @if($message = Session::get('mensaje'))
@@ -19,19 +19,26 @@
         <div class="col-md-12">
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">Llene los datos</h3>
+                    <h3 class="card-title"><i class="bi bi-journal-check"></i> ---Llene los datos---</h3>
                 </div>
                 <div class="card-body">
 
                     <form action="{{url('admin/delegados')}}" method="post">
                         @csrf
                                 <div class="row">
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="">C.I.</label>
+                                            <input type="text" name="ci" class="form-control">
+                                        </div>
+                                    </div>                                    
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="">Nombres</label>
                                             <input type="text"name="nombres" class="form-control">
                                         </div>
-                                    </div>
+                                        </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="">Apellido Paterno</label>
@@ -44,141 +51,93 @@
                                             <input type="text" name="apm" class="form-control">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="">Género</label>
-                                        <select name="genero" class="form-control">
-                                            <option value="MASCULINO">MASCULINO</option>
-                                            <option value="FEMENINO">FEMENINO</option>
-                                        </select>
+                                    
+                                </div>  
+
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="">Género</label>
+                                                    <select name="genero" class="form-control">
+                                                        <option value="MASCULINO">MASCULINO</option>
+                                                        <option value="FEMENINO">FEMENINO</option>
+                                                    </select>
+                                                    </div>
+                                                </div>                                
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="">Fecha Nacimiento</label>
+                                                    <input type="date" name="fecnac" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="">Celular</label>
+                                                    <input type="number" name="celular" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="">Correo electronico</label>
+                                                    <input type="email" name="correo_electronico" class="form-control" placeholder="correo@dominio.com">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="">Observaciones</label>
+                                                    <input type="text" name="obs" class="form-control">
+                                                </div>
+                                            </div>
+
+                                            
                                         </div>
-                                    </div>
 
-                                </div>
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="">C.I.</label>
-                                        <input type="text" name="ci" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="">Fecha Nacimiento</label>
-                                        <input type="date" name="fecnac" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="">Celular</label>
-                                        <input type="number" name="celular" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="">Recinto Votación</label>
-                                        <input type="text" name="recintovot" class="form-control">
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="">Agrupación</label>
-                                            <select name="agrupa" id="agrupa" class="form-control" required>
-                                                <option value="">Seleccione una agrupación</option>
-                                                <option value="UN" {{ old('agrupa', $miembro->agrupa ?? '') == 'UN' ? 'selected' : '' }}>UN</option>
-                                                <option value="CREEMOS" {{ old('agrupa', $miembro->agrupa ?? '') == 'CREEMOS' ? 'selected' : '' }}>CREEMOS</option>
-                                                <option value="MNR" {{ old('agrupa', $miembro->agrupa ?? '') == 'MNR' ? 'selected' : '' }}>MNR</option>
-                                                <option value="TODOS" {{ old('agrupa', $miembro->agrupa ?? '') == 'TODOS' ? 'selected' : '' }}>TODOS</option>
-                                                <option value="NASUR" {{ old('agrupa', $miembro->agrupa ?? '') == 'NASUR' ? 'selected' : '' }}>NASUR</option>
-                                                <option value="AIR" {{ old('agrupa', $miembro->agrupa ?? '') == 'AIR' ? 'selected' : '' }}>AIR</option>
-                                                <option value="CAMBIO25" {{ old('agrupa', $miembro->agrupa ?? '') == 'CAMBIO25' ? 'selected' : '' }}>CAMBIO25</option>
-                                                <option value="MSM" {{ old('agrupa', $miembro->agrupa ?? '') == 'MSM' ? 'selected' : '' }}>MSM</option>
-                                                <option value="MOVIMIENTO DIGNIDAD" {{ old('agrupa', $miembro->agrupa ?? '') == 'MOVIMIENTO DIGNIDAD' ? 'selected' : '' }}>MOVIMIENTO DIGNIDAD</option>
-                                                <option value="YO AMO TARIJA" {{ old('agrupa', $miembro->agrupa ?? '') == 'YO AMO TARIJA' ? 'selected' : '' }}>YO AMO TARIJA</option>
-                                                <option value="COPACIMIL" {{ old('agrupa', $miembro->agrupa ?? '') == 'COPACIMIL' ? 'selected' : '' }}>COPACIMIL</option>
+                                            <div class="card-header">
+                                            <h3 class="card-title"><i class="bi bi-geo-alt-fill"></i> ---Ubicación de votación---</h3>
+                                            
+                                            </div>
+                            
+                                 <div class="row">
+                                        <!-- Provincia -->
+                                        <div class="col-md-3">
+                                            <label>Provincia</label>
+                                            <select id="province_id" name="province_id" class="form-control select2">
+                                                <option value="">Seleccione una provincia</option>
+                                                @foreach($provinces as $province)
+                                                    <option value="{{ $province->id }}">{{ $province->name }}</option>
+                                                @endforeach
                                             </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="">Estado</label>
-                                        <select name="estado" class="form-control">
-                                        <option value="ACTIVO">ACTIVO</option>
-                                        <option value="INACTIVO">INACTIVO</option>
-                                      </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="">Encargado</label>
-                                        <select name="delegado" class="form-control">
-                                        <option value="DELEGADO MESA"> DELEGADO MESA</option>
-                                        <option value="JEFE RECINTO"> JEFE RECINTO</option>
-                                      </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="">Observaciones</label>
-                                        <input type="text" name="obs" class="form-control">
-                                    </div>
-                                </div>                        
+                                        </div>
 
-                            </div>
+                                        <!-- Municipio -->
+                                        <div class="col-md-3">
+                                            <label>Municipio</label>
+                                            <select id="municipality" name="municipality_id" class="form-control select2">
+                                                <option value="">Seleccione un municipio</option>
+                                            </select>
+                                        </div>
 
-                            <div class="row">
-                                <!-- Provincia -->
-                                <div class="col-md-3">
-                                    <label>Provincia</label>
-                                    <select id="province_id" name="province_id" class="form-control select2">
-                                        <option value="">Seleccione una provincia</option>
-                                        @foreach($provinces as $province)
-                                            <option value="{{ $province->id }}">{{ $province->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                        <!-- Recinto -->
+                                        <div class="col-md-3">
+                                            <label>Recinto</label>
+                                            <select id="electoral_precinct_id" name="electoral_precinct_id" class="form-control select2">
+                                                <option value="">Seleccione un recinto</option>
+                                            </select>
+                                        </div>
 
-                                <!-- Municipio -->
-                                <div class="col-md-3">
-                                    <label>Municipio</label>
-                                    <select id="municipality" name="municipality_id" class="form-control select2">
-                                        <option value="">Seleccione un municipio</option>
-                                    </select>
-                                </div>
-
-                                <!-- Recinto -->
-                                <div class="col-md-3">
-                                    <label>Recinto</label>
-                                    <select id="electoral_precinct_id" name="electoral_precinct_id" class="form-control select2">
-                                        <option value="">Seleccione un recinto</option>
-                                    </select>
-                                </div>
-
-                                <!-- Mesa -->
-                                <div class="col-md-3">
-                                    <label>Mesas</label>
-                                    <select id="table_ids" name="table_ids[]" class="form-control select2" multiple>
-                                        <option value="">Seleccione una mesa</option>
-                                    </select>
-                                </div>
-                            </div>
+                                </div>                     
 
                             
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <a href="{{url('admin/delegados')}}" class="btn btn-secondary"> Volver</a>
-                                        <button type="submit" class="btn btn-primary"><i class="bi bi-floppy2"></i> Guardar registro</button>
-                                    </div>
+                                    <hr>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <a href="{{ route('postulaciones.index') }}" class="btn btn-secondary"> Volver</a>
+                                            <button type="submit" class="btn btn-primary"><i class="bi bi-floppy2"></i> Guardar registro</button>
+                                        </div>
 
+                                    </div>
                                 </div>
-                            </div>
                         
                     </form>
 

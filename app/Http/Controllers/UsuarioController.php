@@ -8,9 +8,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+use Illuminate\Validation\Rule;
+
 
 class UsuarioController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:ver usuarios')->only(['index', 'show']);
+        $this->middleware('can:crear usuarios')->only(['create', 'store']);
+        $this->middleware('can:editar usuarios')->only(['edit', 'update']);
+        $this->middleware('can:eliminar usuarios')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -25,7 +36,8 @@ class UsuarioController extends Controller
      */
     public function create()
     {
-        return view('admin.usuarios.create');
+        $roles = Role::orderBy('name')->get();
+        return view('admin.usuarios.create', compact('roles'));
     }
 
     /**
@@ -33,13 +45,13 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //$datos = request()->all();
-        //return response()->json($datos);
+       
 
         $request->validate([
             'name' => 'required|max:100',
             'email' => 'required|unique:users',
             'password' => 'required|confirmed',
+            'role' => 'required|exists:roles,name',
         ]);
 
         $usuario = new User();
@@ -48,6 +60,7 @@ class UsuarioController extends Controller
         $usuario->password = Hash::make($request['password']);
         $usuario->slug = Str::uuid();
         $usuario->save();
+        $usuario->assignRole($request->role);
 
         return redirect()->route('usuarios.index')
             ->with('mensaje','Se registro al usuario de la manera correcta')
@@ -77,24 +90,28 @@ class UsuarioController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|max:100',
-            'email' => 'required|unique:users',
-            'password' => 'required|confirmed',
-        ]);
+            {
+                $usuario = User::findOrFail($id);
 
-        $usuario = User::find($id);
-        $usuario->name = $request->name;
-        $usuario->email = $request->email;
-        $usuario->password = Hash::make($request['password']);
-        $usuario->save();
+                $request->validate([
+                    'name'     => ['required','string','max:100'],
+                    'email'    => ['required','email', Rule::unique('users','email')->ignore($usuario->id)],
+                    'password' => ['nullable','confirmed','min:8'],
+                ]);
 
-        return redirect()->route('usuarios.index')
-            ->with('mensaje','Se actualizó al usuario de la manera correcta')
-            ->with('icono','success');
+                $usuario->name  = $request->name;
+                $usuario->email = $request->email;
 
-    }
+                if ($request->filled('password')) {
+                    $usuario->password = Hash::make($request->password);
+                }
+
+                $usuario->save();
+
+                return redirect()->route('usuarios.index')
+                    ->with('mensaje','Se actualizó al usuario de la manera correcta')
+                    ->with('icono','success');
+            }
 
     /**
      * Remove the specified resource from storage.
@@ -113,8 +130,7 @@ class UsuarioController extends Controller
 
     public function registro_create(Request $request)
     {
-        //$datos = request()->all();
-        //return response()->json($datos);
+        
 
         $request->validate([
             'name' => 'required|max:100',
@@ -135,5 +151,18 @@ class UsuarioController extends Controller
             ->with('icono','success');
 
     }
+
+                public function editRoles(User $user)
+            {
+                $roles = Role::orderBy('name')->get();
+                return view('admin.usuarios.roles', compact('user','roles'));
+            }
+
+            public function updateRoles(Request $request, User $user)
+            {
+                $user->syncRoles($request->input('roles', []));
+                return redirect()->route('usuarios.index')
+                    ->with('mensaje','Roles actualizados correctamente')->with('icono','success');
+            }
 
 }

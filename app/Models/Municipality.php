@@ -12,7 +12,15 @@ class Municipality extends Model
 
    public function electoralPrecincts()
 {
-    return $this->hasMany(ElectoralPrecinct::class);
+    return $this->hasMany(ElectoralPrecinct::class, 'municipality_id');
 }
+public function province()
+    {
+        return $this->belongsTo(Province::class, 'province_id');
+    }
 
+    public function districts()
+    {
+        return $this->hasMany(District::class, 'municipality_id');
+    }
 }

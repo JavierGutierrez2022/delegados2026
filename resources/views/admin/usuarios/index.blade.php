@@ -48,6 +48,9 @@
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
                                         </form>
+                                        <a href="{{ route('usuarios.roles.edit', $usuario) }}" class="btn btn-sm btn-warning" title="Asignar roles">
+                                            <i class="fas fa-user-shield"></i>
+                                        </a>
                                         <script>
                                             function preguntar<?=$id;?>(event) {
                                                 event.preventDefault();

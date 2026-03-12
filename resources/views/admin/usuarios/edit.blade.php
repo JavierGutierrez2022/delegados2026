@@ -40,7 +40,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="">Password</label>
-                                    <input type="password" name="password" class="form-control" required>
+                                    <input type="password" name="password" class="form-control" placeholder="Dejar vacío para no cambiar">
                                     @error('password')
                                     <small style="color: red">{{$message}}</small>
                                     @enderror
@@ -61,8 +61,8 @@
                                 <a href="{{url('admin/usuarios')}}" class="btn btn-secondary">Cancelar</a>
                                 <button type="submit" class="btn btn-success"><i class="bi bi-pencil-square"></i> Actualizar registro</button>
                             </div>
-                        </div>
-                    </form>
+                        </div>                   
+                        
                 </div>
             </div>
         </div>

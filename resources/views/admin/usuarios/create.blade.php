@@ -54,6 +54,24 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">Rol</label>
+                                    <select name="role" id="role" class="form-control" required>
+                                        <option value="">Seleccione un rol</option>
+                                        @foreach(($roles ?? []) as $role)
+                                            <option value="{{ $role->name }}" {{ old('role') === $role->name ? 'selected' : '' }}>
+                                                {{ $role->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('role')
+                                    <small style="color: red">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                         <hr>
                         <div class="row">
                             <div class="col-md-12">

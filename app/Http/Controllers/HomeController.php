@@ -2,27 +2,81 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
-        return view('home');
+        // === contadores que ya usas en tus tarjetas ===
+        $usuarios           = DB::table('users')->get();
+        $miembros           = DB::table('miembros')->get();
+        $provinces          = DB::table('provinces')->get();
+        $municipalities     = DB::table('municipalities')->where('state', 'ACTIVO')->get();
+        $electoralprecincts = DB::table('electoral_precincts')->where('state', 'ACTIVO')->get();
+        $tables             = DB::table('tables')->get();
+
+        // === MÉTRICAS PARA LOS DONUTS ===
+
+        // Mesas cubiertas: mesa que tiene propietario Y suplente
+        $totalMesas = DB::table('tables')->count();
+
+        $mesasCubiertas = DB::table('assignments as a')
+            ->join('miembros as mm', 'mm.id', '=', 'a.miembro_id')
+            ->where('a.scope', 'MESA')
+            ->whereNotNull('a.table_id')
+            ->select('a.table_id')
+            ->groupBy('a.table_id')
+            ->havingRaw("SUM(a.role = 'DELEGADO_PROPIETARIO') >= 1")
+            ->havingRaw("SUM(a.role = 'DELEGADO_SUPLENTE') >= 1")
+            ->whereExists(function ($q) {
+                $q->selectRaw('1')
+                    ->from('assignments as ar')
+                    ->join('miembros as mr', 'mr.id', '=', 'ar.miembro_id')
+                    ->whereColumn('ar.electoral_precinct_id', 'a.electoral_precinct_id')
+                    ->where('ar.scope', 'RECINTO')
+                    ->where('ar.role', 'JEFE_DE_RECINTO');
+            })
+            ->count();
+
+        // Recintos cubiertos: recinto con JEFE_DE_RECINTO
+        $totalRecintos = DB::table('electoral_precincts')->where('state', 'ACTIVO')->count();
+
+        $recintosCubiertos = DB::table('assignments')
+            ->join('miembros as mm', 'mm.id', '=', 'assignments.miembro_id')
+            ->where('scope', 'RECINTO')
+            ->where('role', 'JEFE_DE_RECINTO')
+            ->distinct('electoral_precinct_id')
+            ->count('electoral_precinct_id');
+
+        $mesasPct = $totalMesas > 0 ? (($mesasCubiertas / $totalMesas) * 100) : 0;
+        if ($mesasCubiertas < $totalMesas) {
+            $mesasPct = min(99.99, $mesasPct);
+        }
+        $mesasPct = round($mesasPct, 2);
+
+        $recintosPct = $totalRecintos > 0 ? (($recintosCubiertos / $totalRecintos) * 100) : 0;
+        if ($recintosCubiertos < $totalRecintos) {
+            $recintosPct = min(99.99, $recintosPct);
+        }
+        $recintosPct = round($recintosPct, 2);
+
+        $metrics = [
+            'mesas' => [
+                'total'     => $totalMesas,
+                'cubiertas' => $mesasCubiertas,
+                'pct'       => $mesasPct,
+            ],
+            'recintos' => [
+                'total'     => $totalRecintos,
+                'cubiertos' => $recintosCubiertos,
+                'pct'       => $recintosPct,
+            ],
+        ];
+
+        return view('admin.index', compact(
+            'usuarios','miembros','provinces','municipalities',
+            'electoralprecincts','tables','metrics'
+        ));
     }
 }
