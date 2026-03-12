@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Serve static assets from the real public directory.
+    RewriteRule ^(build|css|dist|font|imagenes|plugins)/(.*)$ public_html/$1/$2 [L]
+    RewriteRule ^(favicon\.ico|robots\.txt)$ public_html/$1 [L]
+
+    # Send application routes to the front controller in the project root.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
