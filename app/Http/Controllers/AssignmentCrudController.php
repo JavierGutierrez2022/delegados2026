@@ -52,6 +52,9 @@ class AssignmentCrudController extends Controller
         $q->when($request->filled('municipality_id'), fn($qq) =>
             $qq->where('mu.id', $request->municipality_id)
         );
+        $q->when($request->filled('district_id'), fn($qq) =>
+            $qq->where('r.district_id', $request->district_id)
+        );
         $q->when($request->filled('precinct_id'), fn($qq) =>
             $qq->where('a.electoral_precinct_id', $request->precinct_id)
         );
@@ -170,4 +173,3 @@ class AssignmentCrudController extends Controller
         return back()->with('mensaje', 'Asignacion eliminada')->with('icono', 'success');
     }
 }
-
