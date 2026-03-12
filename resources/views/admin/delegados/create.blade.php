@@ -22,19 +22,20 @@
                     <h3 class="card-title"><i class="bi bi-journal-check"></i> ---Llene los datos---</h3>
                 </div>
                 <div class="card-body">
+                    <p class="text-muted mb-3"><span class="text-danger">*</span> Campos obligatorios</p>
 
                     <form action="{{ url('admin/delegados') }}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="">C.I.</label>
+                                    <label for="">C.I. <span class="text-danger">*</span></label>
                                     <input type="text" name="ci" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="">Nombres</label>
+                                    <label for="">Nombres <span class="text-danger">*</span></label>
                                     <input type="text" name="nombres" class="form-control">
                                 </div>
                             </div>
@@ -55,7 +56,7 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="">Genero</label>
+                                    <label for="">Genero <span class="text-danger">*</span></label>
                                     <select name="genero" class="form-control">
                                         <option value="MASCULINO">MASCULINO</option>
                                         <option value="FEMENINO">FEMENINO</option>
