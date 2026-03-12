@@ -26,7 +26,9 @@ class ReporteCoberturaController extends Controller
     {
         if ($r->filled('matriz_distrito')) {
             $target = mb_strtoupper(trim((string) $r->matriz_distrito));
-            $slug = preg_replace('/[^A-Za-z0-9_-]+/', '_', $target) ?: 'distrito';
+            $slug = $target === 'TODOS'
+                ? 'todos'
+                : (preg_replace('/[^A-Za-z0-9_-]+/', '_', $target) ?: 'distrito');
             $detalle = $this->buildDistritoDetalle($r, $target);
             return Excel::download(
                 new CoberturaDistritoDetalleExport($detalle),
@@ -111,7 +113,7 @@ class ReporteCoberturaController extends Controller
                 ? '<i class="bi bi-check-circle-fill text-success"></i>'
                 : '<i class="bi bi-exclamation-triangle-fill text-warning"></i>')
             ->addColumn('cubierta', function($row){
-                $covered = $row->has_propietario && $row->has_suplente && $row->has_jefe;
+                $covered = $row->has_propietario && $row->has_jefe;
                 return $covered
                     ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> CUBIERTA</span>'
                     : '<span class="badge bg-secondary"><i class="bi bi-exclamation-circle"></i> PENDIENTE</span>';
@@ -157,13 +159,6 @@ class ReporteCoberturaController extends Controller
                 ->where('a.role', 'DELEGADO_PROPIETARIO')
                 ->exists();
 
-            $hasSupl = DB::table('assignments as a')
-                ->join('miembros as mm', 'mm.id', '=', 'a.miembro_id')
-                ->where('a.scope', 'MESA')
-                ->where('a.table_id', $m->id)
-                ->where('a.role', 'DELEGADO_SUPLENTE')
-                ->exists();
-
             $hasJefe = DB::table('assignments as a')
                 ->join('miembros as mm', 'mm.id', '=', 'a.miembro_id')
                 ->where('a.scope', 'RECINTO')
@@ -171,7 +166,7 @@ class ReporteCoberturaController extends Controller
                 ->where('a.role', 'JEFE_DE_RECINTO')
                 ->exists();
 
-            if ($hasProp && $hasSupl && $hasJefe) {
+            if ($hasProp && $hasJefe) {
                 $cubiertas++;
             }
         }
@@ -256,8 +251,7 @@ class ReporteCoberturaController extends Controller
             ->whereIn('a.table_id', $allMesaIds)
             ->selectRaw("
                 a.table_id,
-                SUM(a.role='DELEGADO_PROPIETARIO') as prop,
-                SUM(a.role='DELEGADO_SUPLENTE') as supl
+                SUM(a.role='DELEGADO_PROPIETARIO') as prop
             ")
             ->groupBy('a.table_id')
             ->get();
@@ -266,7 +260,7 @@ class ReporteCoberturaController extends Controller
         foreach ($mesaRoles as $mr) {
             $tableId = (int) $mr->table_id;
             $recintoId = $mesaToRecinto[$tableId] ?? 0;
-            if ((int) $mr->prop >= 1 && (int) $mr->supl >= 1 && isset($jefeSet[$recintoId])) {
+            if ((int) $mr->prop >= 1 && isset($jefeSet[$recintoId])) {
                 $coveredMesaSet[$tableId] = true;
             }
         }
@@ -423,6 +417,7 @@ class ReporteCoberturaController extends Controller
         if ($r->filled('table_id'))        $q->where('t.id',  $r->table_id);
 
         $target = mb_strtoupper(trim($targetDistrict));
+        $exportAll = $target === 'TODOS';
         $baseRows = $q->orderBy('p.name')->orderBy('mu.name')->orderBy('e.name')->orderBy('t.table_number')->get();
         if ($baseRows->isEmpty()) {
             return [];
@@ -495,12 +490,11 @@ class ReporteCoberturaController extends Controller
                 $item->district_name,
                 $item->electoral_seat
             );
-            if (mb_strtoupper($label) !== $target) {
+            if (!$exportAll && mb_strtoupper($label) !== $target) {
                 continue;
             }
 
             $cubierta = (int) $item->has_propietario === 1
-                && (int) $item->has_suplente === 1
                 && (int) $item->has_jefe === 1;
 
             $rows[] = [
