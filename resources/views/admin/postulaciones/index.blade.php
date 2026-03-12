@@ -60,7 +60,10 @@
                 </div>
               </div>
 
-              <div class="col-md-4 d-flex justify-content-end gap-2">
+              <div class="col-md-4 d-flex justify-content-end align-items-end flex-wrap" style="gap: .5rem;">
+                <a href="{{ route('postulaciones.export.excel') }}" id="btn-exportar-excel" class="btn btn-success mt-2 mt-md-0 shadow-sm">
+                  <i class="fas fa-file-excel"></i> Descargar Excel
+                </a>
                 <button type="button" id="btn-limpiar" class="btn btn-primary mt-2 mt-md-0">Limpiar</button>
                 @can('menu.usuarios')
                 <button type="button" id="btn-purge-postulaciones" class="btn btn-danger mt-2 mt-md-0" data-url="{{ route('postulaciones.purge') }}">
@@ -103,6 +106,22 @@
 @push('scripts')
 <script>
 $(function(){
+  function buildExportUrl() {
+    const params = new URLSearchParams({
+      province_id: $('#province_id').val() || '',
+      municipality_id: $('#municipality_id').val() || '',
+      precinct_id: $('#precinct_id').val() || '',
+      cedula: $('#cedula').val() || '',
+      telefono: $('#telefono').val() || '',
+    });
+
+    return "{{ route('postulaciones.export.excel') }}?" + params.toString();
+  }
+
+  $('#btn-exportar-excel').on('click', function(e){
+    e.preventDefault();
+    window.location = buildExportUrl();
+  });
 
   // Dependent combos
   $('#province_id').on('change', function(){
@@ -169,15 +188,7 @@ $(function(){
       {
         text: 'Excel',
         action: function () {
-          const params = new URLSearchParams({
-            province_id: $('#province_id').val() || '',
-            municipality_id: $('#municipality_id').val() || '',
-            precinct_id: $('#precinct_id').val() || '',
-            cedula: $('#cedula').val() || '',
-            telefono: $('#telefono').val() || '',
-          });
-
-          window.location = "{{ route('postulaciones.export.excel') }}?" + params.toString();
+          window.location = buildExportUrl();
         }
       },
       'pdf',
@@ -267,4 +278,21 @@ $(function(){
 
 });
 </script>
+<style>
+  #btn-exportar-excel {
+    min-width: 170px;
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: #1f9d55;
+    border-color: #1f9d55;
+    color: #fff;
+  }
+
+  #btn-exportar-excel:hover,
+  #btn-exportar-excel:focus {
+    background-color: #18864a;
+    border-color: #18864a;
+    color: #fff;
+  }
+</style>
 @endpush

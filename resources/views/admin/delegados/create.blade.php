@@ -30,25 +30,25 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">C.I. <span class="text-danger">*</span></label>
-                                    <input type="text" name="ci" class="form-control">
+                                    <input type="text" name="ci" value="{{ old('ci') }}" class="form-control js-uppercase">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">Nombres <span class="text-danger">*</span></label>
-                                    <input type="text" name="nombres" class="form-control">
+                                    <input type="text" name="nombres" value="{{ old('nombres') }}" class="form-control js-uppercase">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">Apellido Paterno</label>
-                                    <input type="text" name="app" class="form-control">
+                                    <input type="text" name="app" value="{{ old('app') }}" class="form-control js-uppercase">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">Apellido Materno</label>
-                                    <input type="text" name="apm" class="form-control">
+                                    <input type="text" name="apm" value="{{ old('apm') }}" class="form-control js-uppercase">
                                 </div>
                             </div>
                         </div>
@@ -58,33 +58,33 @@
                                 <div class="form-group">
                                     <label for="">Genero <span class="text-danger">*</span></label>
                                     <select name="genero" class="form-control">
-                                        <option value="MASCULINO">MASCULINO</option>
-                                        <option value="FEMENINO">FEMENINO</option>
+                                        <option value="MASCULINO" {{ old('genero') === 'MASCULINO' ? 'selected' : '' }}>MASCULINO</option>
+                                        <option value="FEMENINO" {{ old('genero') === 'FEMENINO' ? 'selected' : '' }}>FEMENINO</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="">Fecha Nacimiento</label>
-                                    <input type="date" name="fecnac" class="form-control">
+                                    <input type="date" name="fecnac" value="{{ old('fecnac') }}" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="">Celular</label>
-                                    <input type="number" name="celular" class="form-control">
+                                    <input type="number" name="celular" value="{{ old('celular') }}" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="">Correo electronico</label>
-                                    <input type="email" name="correo_electronico" class="form-control" placeholder="correo@dominio.com">
+                                    <input type="email" name="correo_electronico" value="{{ old('correo_electronico') }}" class="form-control js-lowercase" placeholder="correo@dominio.com">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="">Observaciones</label>
-                                    <input type="text" name="obs" class="form-control">
+                                    <input type="text" name="obs" value="{{ old('obs') }}" class="form-control js-uppercase">
                                 </div>
                             </div>
                         </div>
@@ -139,6 +139,18 @@
 @section('scripts')
 <script>
 $(function () {
+    $('.js-uppercase').each(function () {
+        this.value = (this.value || '').toLocaleUpperCase('es-BO');
+    }).on('input', function () {
+        this.value = (this.value || '').toLocaleUpperCase('es-BO');
+    });
+
+    $('.js-lowercase').each(function () {
+        this.value = (this.value || '').toLocaleLowerCase('es-BO');
+    }).on('input', function () {
+        this.value = (this.value || '').toLocaleLowerCase('es-BO');
+    });
+
     $('#electoral_precinct_id').select2({
         placeholder: 'Seleccione un recinto',
         allowClear: true,
@@ -230,6 +242,14 @@ $(function () {
 });
 </script>
 <style>
+    .js-uppercase {
+        text-transform: uppercase;
+    }
+
+    .js-lowercase {
+        text-transform: lowercase;
+    }
+
     #select2-electoral_precinct_id-container {
         line-height: calc(2.25rem + 2px);
     }

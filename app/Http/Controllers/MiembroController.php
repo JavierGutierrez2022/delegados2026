@@ -61,10 +61,10 @@ class MiembroController extends Controller
                 ]);
 
                 $miembro = new Miembro();
-                $miembro->ci      = trim($request->ci);
-                $miembro->nombres = $request->nombres;
-                $miembro->app     = $request->app;
-                $miembro->apm     = $request->apm;
+                $miembro->ci      = mb_strtoupper(trim((string) $request->ci));
+                $miembro->nombres = mb_strtoupper(trim((string) $request->nombres));
+                $miembro->app     = $request->filled('app') ? mb_strtoupper(trim((string) $request->app)) : null;
+                $miembro->apm     = $request->filled('apm') ? mb_strtoupper(trim((string) $request->apm)) : null;
                 $miembro->genero  = $request->genero;
 
                 // Si usas dd/mm/YYYY descomenta esta línea:
@@ -73,8 +73,10 @@ class MiembroController extends Controller
                 $miembro->fecnac  = $request->fecnac;
 
                 $miembro->celular = $request->celular;
-                $miembro->correo_electronico = $request->correo_electronico;
-                $miembro->obs     = $request->obs;
+                $miembro->correo_electronico = $request->filled('correo_electronico')
+                    ? mb_strtolower(trim((string) $request->correo_electronico))
+                    : null;
+                $miembro->obs     = $request->filled('obs') ? mb_strtoupper(trim((string) $request->obs)) : null;
                 $miembro->province_id         = $request->province_id;
                 $miembro->municipality_id     = $request->municipality_id;
                 $miembro->electoral_precinct_id = $request->electoral_precinct_id;
@@ -272,4 +274,3 @@ class MiembroController extends Controller
 
 
 }
-
