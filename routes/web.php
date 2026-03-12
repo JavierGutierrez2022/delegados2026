@@ -151,7 +151,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 // === REPORTE DE COBERTURA ===
-Route::prefix('reportes')->middleware(['auth','can:menu.cobertura_mesas'])->group(function () {
+Route::prefix('reportes')->middleware(['auth'])->group(function () {
     Route::get('/cobertura',        [\App\Http\Controllers\ReporteCoberturaController::class,'index'])->name('cobertura.index');
     Route::get('/cobertura/data',   [\App\Http\Controllers\ReporteCoberturaController::class,'data'])->name('cobertura.data');       // DataTables
     Route::get('/cobertura/resumen',[\App\Http\Controllers\ReporteCoberturaController::class,'resumen'])->name('cobertura.resumen'); // KPIs
