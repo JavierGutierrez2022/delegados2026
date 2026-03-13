@@ -59,6 +59,7 @@ class ReporteCoberturaController extends Controller
             ->join('electoral_precincts as e', 'e.id', '=', 't.electoral_precinct_id')
             ->leftJoin('municipalities as mu', 'mu.id', '=', 'e.municipality_id')
             ->leftJoin('provinces as p', 'p.id', '=', 'mu.province_id')
+            ->where('t.state', 'ACTIVO')
             ->where('e.state', 'ACTIVO')
             ->where('mu.state', 'ACTIVO')
             ->selectRaw("
@@ -129,6 +130,7 @@ class ReporteCoberturaController extends Controller
             ->join('electoral_precincts as e', 'e.id', '=', 't.electoral_precinct_id')
             ->leftJoin('municipalities as mu', 'mu.id', '=', 'e.municipality_id')
             ->leftJoin('provinces as p', 'p.id', '=', 'mu.province_id')
+            ->where('t.state', 'ACTIVO')
             ->where('e.state', 'ACTIVO')
             ->where('mu.state', 'ACTIVO')
             ->select('t.id','e.id as eid');
@@ -185,6 +187,7 @@ class ReporteCoberturaController extends Controller
             ->leftJoin('municipalities as mu', 'mu.id', '=', 'e.municipality_id')
             ->leftJoin('provinces as p', 'p.id', '=', 'mu.province_id')
             ->leftJoin('districts as d', 'd.id', '=', 'e.district_id')
+            ->where('t.state', 'ACTIVO')
             ->where('e.state', 'ACTIVO')
             ->where('mu.state', 'ACTIVO')
             ->selectRaw('
@@ -371,6 +374,7 @@ class ReporteCoberturaController extends Controller
             ->leftJoin('municipalities as mu', 'mu.id', '=', 'e.municipality_id')
             ->leftJoin('provinces as p', 'p.id', '=', 'mu.province_id')
             ->leftJoin('districts as d', 'd.id', '=', 'e.district_id')
+            ->where('t.state', 'ACTIVO')
             ->where('e.state', 'ACTIVO')
             ->where('mu.state', 'ACTIVO')
             ->selectRaw("
