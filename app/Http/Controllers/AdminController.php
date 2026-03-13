@@ -21,7 +21,10 @@ class AdminController extends Controller
         $electoralprecincts = ElectoralPrecinct::where('state', 'ACTIVO')->get();
         $tables = Table::query()
             ->join('electoral_precincts', 'electoral_precincts.id', '=', 'tables.electoral_precinct_id')
+            ->join('municipalities', 'municipalities.id', '=', 'electoral_precincts.municipality_id')
+            ->where('tables.state', 'ACTIVO')
             ->where('electoral_precincts.state', 'ACTIVO')
+            ->where('municipalities.state', 'ACTIVO')
             ->select('tables.*')
             ->get();
 
@@ -29,6 +32,7 @@ class AdminController extends Controller
         $activeTableIds = DB::table('tables as t')
             ->join('electoral_precincts as e', 'e.id', '=', 't.electoral_precinct_id')
             ->join('municipalities as m', 'm.id', '=', 'e.municipality_id')
+            ->where('t.state', 'ACTIVO')
             ->where('e.state', 'ACTIVO')
             ->where('m.state', 'ACTIVO')
             ->pluck('t.id');
@@ -38,17 +42,14 @@ class AdminController extends Controller
         $mesasCubiertas = 0;
         if ($totalMesas > 0) {
             $mesasCubiertas = DB::table('assignments as a')
-                ->join('miembros as mm', 'mm.id', '=', 'a.miembro_id')
                 ->where('a.scope', 'MESA')
                 ->whereIn('a.table_id', $activeTableIds)
                 ->select('a.table_id')
                 ->groupBy('a.table_id')
                 ->havingRaw("SUM(a.role = 'DELEGADO_PROPIETARIO') >= 1")
-                ->havingRaw("SUM(a.role = 'DELEGADO_SUPLENTE') >= 1")
                 ->whereExists(function ($q) {
                     $q->selectRaw('1')
                         ->from('assignments as ar')
-                        ->join('miembros as mr', 'mr.id', '=', 'ar.miembro_id')
                         ->whereColumn('ar.electoral_precinct_id', 'a.electoral_precinct_id')
                         ->where('ar.scope', 'RECINTO')
                         ->where('ar.role', 'JEFE_DE_RECINTO');

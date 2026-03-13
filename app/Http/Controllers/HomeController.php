@@ -14,25 +14,37 @@ class HomeController extends Controller
         $provinces          = DB::table('provinces')->get();
         $municipalities     = DB::table('municipalities')->where('state', 'ACTIVO')->get();
         $electoralprecincts = DB::table('electoral_precincts')->where('state', 'ACTIVO')->get();
-        $tables             = DB::table('tables')->get();
+        $tables             = DB::table('tables as t')
+            ->join('electoral_precincts as e', 'e.id', '=', 't.electoral_precinct_id')
+            ->join('municipalities as mu', 'mu.id', '=', 'e.municipality_id')
+            ->where('t.state', 'ACTIVO')
+            ->where('e.state', 'ACTIVO')
+            ->where('mu.state', 'ACTIVO')
+            ->select('t.*')
+            ->get();
 
         // === MÉTRICAS PARA LOS DONUTS ===
 
-        // Mesas cubiertas: mesa que tiene propietario Y suplente
-        $totalMesas = DB::table('tables')->count();
+        // Mesas cubiertas: mesa activa que tiene propietario y su recinto tiene jefe
+        $totalMesas = DB::table('tables as t')
+            ->join('electoral_precincts as e', 'e.id', '=', 't.electoral_precinct_id')
+            ->join('municipalities as mu', 'mu.id', '=', 'e.municipality_id')
+            ->where('t.state', 'ACTIVO')
+            ->where('e.state', 'ACTIVO')
+            ->where('mu.state', 'ACTIVO')
+            ->count();
 
         $mesasCubiertas = DB::table('assignments as a')
-            ->join('miembros as mm', 'mm.id', '=', 'a.miembro_id')
+            ->join('tables as t', 't.id', '=', 'a.table_id')
             ->where('a.scope', 'MESA')
             ->whereNotNull('a.table_id')
+            ->where('t.state', 'ACTIVO')
             ->select('a.table_id')
             ->groupBy('a.table_id')
             ->havingRaw("SUM(a.role = 'DELEGADO_PROPIETARIO') >= 1")
-            ->havingRaw("SUM(a.role = 'DELEGADO_SUPLENTE') >= 1")
             ->whereExists(function ($q) {
                 $q->selectRaw('1')
                     ->from('assignments as ar')
-                    ->join('miembros as mr', 'mr.id', '=', 'ar.miembro_id')
                     ->whereColumn('ar.electoral_precinct_id', 'a.electoral_precinct_id')
                     ->where('ar.scope', 'RECINTO')
                     ->where('ar.role', 'JEFE_DE_RECINTO');
